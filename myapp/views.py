@@ -73,7 +73,6 @@ def add_expense(request):
                         raise ValueError('Split amounts must be provide for each user')
                     if sum(split_amounts)!=amount:
                         raise ValueError('Splits do not add up to the amount')
-                        #return JsonResponse({"error": "Split amounts must be provided for each user."}, status=400)
                     for user_id, split_amount in zip(users, split_amounts):
                         ExpenseSplit.objects.create(
                             user_id=user_id,
@@ -101,25 +100,7 @@ def add_expense(request):
 
 # Endpoint for user's expenses for a given date
 def user_expenses(request, user_id):
-    # user = get_object_or_404(User, pk=user_id)
-    # date_filter = request.GET.get('date')
-
-    # if date_filter:
-    #     expenses = ExpenseSplit.objects.filter(user=user, expense__date=date_filter)
-    # else:
-    #     expenses = ExpenseSplit.objects.filter(user=user)
-
-    # total = sum(expense.amount for expense in expenses)
-
-    # return JsonResponse({
-    #     'user': user.name,
-    #     'expenses': total
-    # })
     try:
-        # user = User.objects.get(id=user_id)
-        # # Get all expenses where the user is involved
-        # user_expenses = Expense.objects.filter(users=user)
-        # serialized_data = ExpenseSerializer(user_expenses, many=True).data
         expenses = Expense.objects.filter(splits__user=user_id)
         serializer = UserExpenseSerializer(expenses, many=True, context={'user_id': user_id})
         return JsonResponse(serializer.data,status=200,safe=False)
@@ -128,17 +109,6 @@ def user_expenses(request, user_id):
 
 # Endpoint for overall expenses
 def overall_expenses(request):
-    # date_filter = request.GET.get('date')
-
-    # if date_filter:
-    #     expenses = Expense.objects.filter(date=date_filter)
-    # else:
-    #     expenses = Expense.objects.all()
-
-    # total_expenses = sum(expense.amount for expense in expenses)
-    # return JsonResponse({
-    #     'total_expenses': total_expenses,
-    # })
     expenses = Expense.objects.all()
     serialized_data = ExpenseSerializer(expenses, many=True).data
     return JsonResponse({
